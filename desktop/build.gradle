@@ -1,7 +1,6 @@
 apply plugin: "java"
 
-sourceCompatibility = 1.6
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceCompatibility = 10
 
 project.ext.mainClassName = "io.github.manuelhegner.airships.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets");
