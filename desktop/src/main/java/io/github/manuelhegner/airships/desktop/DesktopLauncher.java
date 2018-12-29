@@ -7,8 +7,8 @@ import io.github.manuelhegner.airships.AirshipsGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 1000;
-		config.height = 1000;
+		config.width = 1600;
+		config.height = 900;
 		new LwjglApplication(new AirshipsGame(), config);
 	}
 }
