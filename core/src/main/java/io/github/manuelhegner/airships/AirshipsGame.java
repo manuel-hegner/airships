@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import io.github.manuelhegner.airships.entities.ShipType;
 import io.github.manuelhegner.airships.render.Render;
 import io.github.manuelhegner.airships.render.Renderable;
 import io.github.manuelhegner.airships.scenes.BattleScene;
@@ -48,6 +49,7 @@ public class AirshipsGame extends ApplicationAdapter {
 					(float)(p.getRight().getNano()-p.getLeft().getNano()), 
 				batch);
 		}
+		
 		batch.end();
 		
 		fps.update();

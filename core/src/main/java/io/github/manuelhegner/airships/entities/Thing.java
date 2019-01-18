@@ -18,7 +18,7 @@ public abstract class Thing<SELF extends Thing<SELF, TYPE>, TYPE extends ThingTy
 	public void update(float delta) {
 		float drag = 0.5f
 				* 0.2f //c_w
-				* speed.len2() //v²
+				* speed.len2() //vÂ²
 				* 1.2f //air density
 				* type.width * type.width //area of thing
 				* delta //time
