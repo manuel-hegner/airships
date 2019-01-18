@@ -9,6 +9,8 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 1600;
 		config.height = 900;
+		config.foregroundFPS=240;
+		config.vSyncEnabled=false;
 		new LwjglApplication(new AirshipsGame(), config);
 	}
 }

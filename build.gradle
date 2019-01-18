@@ -59,6 +59,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         compile "com.github.czyzby:gdx-kiwi:1.9.1.9.6"
+        compile "org.apache.commons:commons-lang3:3.8.1"
+        compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
         
         compileOnly "org.projectlombok:lombok:1.18.4"
     }

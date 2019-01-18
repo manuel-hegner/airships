@@ -9,7 +9,12 @@ import lombok.Getter;
 
 @Getter
 public class ShipType extends ThingType<ShipType, Ship> {
-	private final TextureRegion img = new TextureRegion(new Texture(Gdx.files.internal("airship.png")));
+	private final TextureRegion img;
+	
+	public ShipType() {
+		img = new TextureRegion(new Texture(Gdx.files.internal("airship.png")));
+		img.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+	}
 
 	@Override
 	public void render(float delta, SpriteBatch batch, Ship ship) {
