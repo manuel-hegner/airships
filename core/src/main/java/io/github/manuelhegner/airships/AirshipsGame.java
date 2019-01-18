@@ -41,7 +41,7 @@ public class AirshipsGame extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		Pair<Render, Render> p = updateLoop.getRenderingPair();
-		if(p != null) {
+		if(p.getLeft() != null) {
 			p.getRight().render(
 				p.getLeft(), 
 				1f + 

@@ -1,9 +1,15 @@
 package io.github.manuelhegner.airships.scenes;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 
-public interface Scene extends Disposable {
-	void update(float delta);
-	void render(float delta, SpriteBatch batch);
+import io.github.manuelhegner.airships.render.Renderable;
+import io.github.manuelhegner.airships.util.LUID;
+import lombok.Getter;
+
+public abstract class Scene implements Disposable {
+	@Getter
+	protected final LUID luid = LUID.next();
+	
+	public abstract Renderable update(float delta);
+	
 }

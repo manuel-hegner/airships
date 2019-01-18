@@ -13,8 +13,6 @@ public abstract class ThingType<SELF extends ThingType<SELF, THING>, THING exten
 	protected final float centerX = 48;
 	protected final float centerY = 40;
 	
-	public abstract void render(float delta, SpriteBatch batch, THING thing);
-
 	@Override
 	public void dispose() {}
 }

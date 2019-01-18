@@ -3,11 +3,11 @@ package io.github.manuelhegner.airships.scenes;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import io.github.manuelhegner.airships.entities.Ship;
+import io.github.manuelhegner.airships.render.GroupRenderable;
+import io.github.manuelhegner.airships.render.GroupRenderable.GroupRenderableBuilder;
 
-public class BattleScene implements Scene {
+public class BattleScene extends Scene {
 
 	private List<Ship> ships = new ArrayList<>();
 	
@@ -19,15 +19,12 @@ public class BattleScene implements Scene {
 	}
 	
 	@Override
-	public void update(float delta) {
+	public GroupRenderable update(float delta) {
+		GroupRenderableBuilder<?, ?> group = GroupRenderable.builder();
+		group.luid(luid);
 		for(Ship ship:ships)
-			ship.update(delta);
-	}
-
-	@Override
-	public void render(float delta, SpriteBatch batch) {
-		for(Ship ship:ships)
-			ship.render(delta, batch);
+			group.item(ship.update(delta));
+		return group.build();
 	}
 
 	@Override
@@ -35,5 +32,4 @@ public class BattleScene implements Scene {
 		for(Ship ship:ships)
 			ship.dispose();
 	}
-
 }

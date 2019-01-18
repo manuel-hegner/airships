@@ -1,8 +1,8 @@
 package io.github.manuelhegner.airships.entities;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
+import io.github.manuelhegner.airships.render.Renderable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,11 +11,11 @@ public abstract class Thing<SELF extends Thing<SELF, TYPE>, TYPE extends ThingTy
 
 	protected final TYPE type;
 	protected Vector2 position = new Vector2(0, 0);
-	protected Vector2 direction = new Vector2(0, 1);
+	protected float rotation = 0;
 	protected Vector2 speed = new Vector2(0,0);
 	
 	@Override
-	public void update(float delta) {
+	public Renderable update(float delta) {
 		float drag = 0.5f
 				* 0.2f //c_w
 				* speed.len2() //v²
@@ -28,13 +28,12 @@ public abstract class Thing<SELF extends Thing<SELF, TYPE>, TYPE extends ThingTy
 			speed.add(speed.cpy().nor().scl(-drag));
 		}
 		position.mulAdd(speed, delta);
+		
+		return createRenderable();
 	}
 	
-	@Override
-	public void render(float delta, SpriteBatch batch) {
-		type.render(delta, batch, (SELF)this);
-	}
-	
+	protected abstract Renderable createRenderable();
+
 	@Override
 	public void dispose() {
 		type.dispose();
