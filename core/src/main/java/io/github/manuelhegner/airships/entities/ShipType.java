@@ -11,7 +11,7 @@ public class ShipType extends ThingType<ShipType, Ship> {
 	private final TextureRegion img;
 	
 	public ShipType() {
-		img = new TextureRegion(new Texture(Gdx.files.internal("airship.png")));
+		img = new TextureRegion(new Texture(Gdx.files.local("assets/airship.png")));
 		img.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 	}
 	
