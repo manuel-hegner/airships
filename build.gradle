@@ -55,6 +55,13 @@ project(":core") {
         
         compileOnly "org.projectlombok:lombok:1.18.4"
     }
+
+	task shipBuilder(type:JavaExec) {
+		main = 'io.github.manuelhegner.airships.tools.shipbuilder.ShipBuilder'
+		classpath = sourceSets.test.runtimeClasspath
+		args "$projectDir/assets", "$buildDir/classes"
+	}
+	build.finalizedBy(shipBuilder) 
 }
 
 tasks.eclipse.doLast {

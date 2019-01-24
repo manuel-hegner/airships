@@ -1,6 +1,7 @@
 package io.github.manuelhegner.airships.entities;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.utils.Disposable;
 
 import lombok.Getter;
@@ -15,4 +16,6 @@ public abstract class ThingType<SELF extends ThingType<SELF, THING>, THING exten
 	
 	@Override
 	public void dispose() {}
+
+	protected abstract BodyDef getBodyDef();
 }
