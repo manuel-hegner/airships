@@ -1,19 +1,15 @@
 package io.github.manuelhegner.airships.entities;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.utils.Disposable;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Getter
+@Getter @SuperBuilder @NoArgsConstructor
 public abstract class ThingType<SELF extends ThingType<SELF, THING>, THING extends Thing<THING, SELF>> implements Disposable {
 
-	protected final float width = 96;
-	protected final float height = 96;
-	protected final float centerX = 48;
-	protected final float centerY = 40;
-	
 	@Override
 	public void dispose() {}
 

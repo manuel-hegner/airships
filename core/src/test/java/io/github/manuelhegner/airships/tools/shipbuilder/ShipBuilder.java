@@ -1,21 +1,16 @@
 package io.github.manuelhegner.airships.tools.shipbuilder;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,11 +19,20 @@ import javax.imageio.ImageIO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.util.Point;
 
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
+import io.github.manuelhegner.airships.entities.ShipType;
+import io.github.manuelhegner.airships.entities.ShipType.ShipTypeBuilder;
+import io.github.manuelhegner.airships.util.io.Jackson;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 public class ShipBuilder {
 
+	private static final ObjectReader SHIPTYPE_READER = Jackson.MAPPER.readerFor(ShipTypeTemplate.class);
+	private static final ObjectWriter SHIPTYPE_WRITER = Jackson.MAPPER.writerFor(ShipType.class).withDefaultPrettyPrinter();
+	
 	public static void main(String[] args) throws IOException {
 		if(args.length != 2 && args.length != 3) {
 			System.out.println("Requires two or three arguments");
@@ -41,7 +45,7 @@ public class ShipBuilder {
 		Files
 			.walk(input.toPath())
 			.parallel()
-			.filter(p->p.toString().endsWith(".png"))
+			.filter(p->p.toString().endsWith(".shiptype.json"))
 			.map(Path::toFile)
 			.filter(File::isFile)
 			.forEach(f -> transform(
@@ -54,7 +58,20 @@ public class ShipBuilder {
 	private static void transform(File source, File target, File debug) {
 		System.out.println("\tanalyzing "+source);
 		try {
-			BufferedImage img = ImageIO.read(source);
+			ShipTypeBuilder<?,?> result = ShipType.builder();
+			ShipTypeTemplate template = SHIPTYPE_READER.readValue(source);
+			
+			BufferedImage img = ImageIO.read(source.toPath().getParent().resolve(template.getImage().toPath()).toFile());
+			result
+				.name(template.getName())
+				.length(template.getLength().orElse(img.getHeight()))
+				.width(img.getWidth())
+				.height(img.getHeight())
+				.centerX(template.getCenterX().orElse(img.getWidth()/2f))
+				.centerY(template.getCenterY().orElse(img.getWidth()/2f))
+				.image(template.getImage())
+				;
+			
 			
 			//find start pixel
 			Point p = findStart(img);
@@ -93,10 +110,14 @@ public class ShipBuilder {
 			points.remove(points.size()-1);
 			
 			System.out.println("\t\t"+points.size()+" points after reduction");
-				
+			result
+				.body(template.getBody());
 				
 			target.getParentFile().mkdirs();
-			ImageIO.write(img, "png", target);
+			SHIPTYPE_WRITER.writeValue(target, result.build());
+			File imgTarget = target.toPath().getParent().resolve(template.getImage().toPath()).toFile();
+			imgTarget.getParentFile().mkdirs();
+			ImageIO.write(img, "png", imgTarget);
 			
 			if(debug != null) {
 				debug.getParentFile().mkdirs();

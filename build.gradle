@@ -52,6 +52,10 @@ project(":core") {
         compile "com.github.czyzby:gdx-kiwi:1.9.1.9.6"
         compile "org.apache.commons:commons-lang3:3.8.1"
         compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+        compile "com.fasterxml.jackson.module:jackson-module-afterburner:2.9.6"
+        compile "com.fasterxml.jackson.module:jackson-module-parameter-names:2.9.6"
+        compile "com.fasterxml.jackson.module:jackson-modules-java8:2.9.6"
+        compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.6"
         
         compileOnly "org.projectlombok:lombok:1.18.4"
     }

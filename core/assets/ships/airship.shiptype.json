@@ -1,0 +1,7 @@
+{
+	"image" : "airship.png",
+	"name" : "TestClass",
+	"length" : 170,
+	"centerX" : 48,
+	"centerY" : 56
+}
