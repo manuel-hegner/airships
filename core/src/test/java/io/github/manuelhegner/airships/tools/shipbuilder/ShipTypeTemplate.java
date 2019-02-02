@@ -10,9 +10,9 @@ import lombok.Data;
 @Data
 public class ShipTypeTemplate {
 	private File image;
-	private Optional<Integer> length;
+	private Optional<Integer> length = Optional.empty();
 	private String name;
-	private Optional<Float> centerX;
-	private Optional<Float> centerY;
+	private Optional<Float> centerX = Optional.empty();
+	private Optional<Float> centerY = Optional.empty();
 	private BodyDef body = new BodyDef();
 }

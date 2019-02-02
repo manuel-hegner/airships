@@ -1,0 +1,7 @@
+{
+	"image" : "rectangle.png",
+	"name" : "rectangleClass",
+	"length" : 170,
+	"centerX" : 48,
+	"centerY" : 56
+}

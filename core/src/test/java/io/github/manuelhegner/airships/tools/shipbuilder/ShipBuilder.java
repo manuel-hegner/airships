@@ -8,17 +8,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.util.Point;
 
+import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -74,8 +78,9 @@ public class ShipBuilder {
 			
 			
 			//find start pixel
-			Point p = findStart(img);
+			
 			List<Point> points = new ArrayList<>();
+			Point p = findStart(img);
 			Direction last = Direction.RIGHT;
 			do {
 				points.add(p);
@@ -92,6 +97,8 @@ public class ShipBuilder {
 			
 			System.out.println("\t\t"+points.size()+" points");
 			
+			double normalizedReductionThreshold = (img.getWidth()*img.getHeight())/2000d;
+			
 			boolean reduced = true;
 			while(reduced == true) {
 				reduced = false;
@@ -102,7 +109,7 @@ public class ShipBuilder {
 					.min(Comparator.comparing(Pair::getRight))
 					.get();
 				
-				if(minPoint.getRight() < 3d) {
+				if(minPoint.getRight() < normalizedReductionThreshold) {
 					reduced = true;
 					points.remove(minPoint.getLeft()-1);
 				}
@@ -112,9 +119,30 @@ public class ShipBuilder {
 			System.out.println("\t\t"+points.size()+" points after reduction");
 			result
 				.body(template.getBody());
+			
+			//triangulate the polygon
+			List<Integer> triangles = Earcut
+				.earcut(points.stream().flatMapToDouble(z->DoubleStream.of(z.getX(), z.getY())).toArray());
+
+			for(int i=0;i<triangles.size();i+=3) {
+				int[] tri = new int[] {
+					triangles.get(i),
+					triangles.get(i+1),
+					triangles.get(i+2)
+				};
+				Arrays.sort(tri);
+				//ArrayUtils.reverse(tri);
 				
+				result.shape(Arrays.stream(tri).mapToObj(points::get).toArray(Point[]::new));
+			}
+			System.out.println("\t\t"+(triangles.size()/3)+" triangles");
+			
+			ShipType fin = result.build();
+			
+			fin.calculateDragCoefficients();
+			
 			target.getParentFile().mkdirs();
-			SHIPTYPE_WRITER.writeValue(target, result.build());
+			SHIPTYPE_WRITER.writeValue(target, fin);
 			File imgTarget = target.toPath().getParent().resolve(template.getImage().toPath()).toFile();
 			imgTarget.getParentFile().mkdirs();
 			ImageIO.write(img, "png", imgTarget);
@@ -125,9 +153,10 @@ public class ShipBuilder {
 				ImageIO.write(img, "png", baos);
 				String img64 = Base64.getEncoder().encodeToString(baos.toByteArray());
 				String svg =  "<svg width=\""+img.getWidth()+"\" height=\""+img.getHeight()+"\">"
-					+"<image width=\""+img.getWidth()+"\" height=\""+img.getHeight()+"\" xlink:href=\"data:image/png;base64,"+img64+"\"/>"
-					+"<polyline points=\""+points.stream().map(c->c.getX()+","+c.getY()).collect(Collectors.joining(" "))+"\" style=\"fill:none;stroke:green;stroke-width:0.2\"/>"
-					+"</svg>";
+					+"<image width=\""+img.getWidth()+"\" height=\""+img.getHeight()+"\" xlink:href=\"data:image/png;base64,"+img64+"\"/>\n";
+				for(Point[] sh : fin.getShapes())
+					svg+="<polygon points=\""+Arrays.stream(sh).map(c->c.getX()+","+c.getY()).collect(Collectors.joining(" "))+"\" style=\"fill:none;stroke:green;stroke-width:0.2\"/>\n";
+				svg+="</svg>";
 				try(BufferedWriter w = Files.newBufferedWriter(debug.toPath())) {
 					w.write(svg);
 				}
@@ -138,7 +167,19 @@ public class ShipBuilder {
 	}
 
 	private static double area(Point a, Point b, Point c) {
-		return 1d/2d * Math.abs(a.getX()*(b.getY()-c.getY()) + b.getX()*(c.getY()-a.getY()) + c.getX()*(a.getY()-b.getY()));
+		double area = 1d/2d * Math.abs(
+			  a.getX()*(b.getY()-c.getY()) 
+			+ b.getX()*(c.getY()-a.getY()) 
+			+ c.getX()*(a.getY()-b.getY())
+		);
+		
+		//punish negative spaces
+		Vector2 v1 = new Vector2(b.getX()-a.getX(), b.getY()-a.getY());
+		Vector2 v2 = new Vector2(b.getX()-c.getX(), b.getY()-c.getY());
+		if((360+v1.angle(v2))%360 < 180)
+			area *= 3;
+		
+		return area;
 	}
 
 	private static Point findStart(BufferedImage img) {
@@ -154,13 +195,13 @@ public class ShipBuilder {
 	}
 
 	private static boolean isTransparent(BufferedImage img, int x, int y) {
-		if(x<0 || y<0 || x>img.getWidth() || y>img.getHeight())
+		if(x<0 || y<0 || x>=img.getWidth() || y>=img.getHeight())
 			return true;
 		/*
 		Color color = new Color(img.getRGB(x, y), true);
 		return color.getAlpha()==0;
 		*/
-		return  ((img.getRGB(x, y) >> 24) & 0xff) == 0;
+		return  ((img.getRGB(x, y) >> 24) & 0xff) < 120;
 	}
 	
 	@RequiredArgsConstructor
