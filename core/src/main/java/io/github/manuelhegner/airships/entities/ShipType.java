@@ -77,8 +77,8 @@ public class ShipType extends ThingType<ShipType, Ship> {
 					result.addAndGet(Math.cos(normal.angleRad(new Vector2(0,-1))));
 					return 0;
 				},
-				x/10f, -50,
-				x/10f, 150
+				x/10f, height + 50,
+				x/10f, - 50
 			);
 		}
 		result.set(result.get()/raysHit.get());
